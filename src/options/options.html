@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本音レビュー - 設定</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .section h2 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .section h2 .required {
+      color: #e53935;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .section h2 .optional {
+      color: #43a047;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    .label-hint {
+      font-weight: normal;
+      font-size: 12px;
+      color: #888;
+      margin-left: 8px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 16px;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    .hint a {
+      color: #667eea;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .status.success {
+      display: block;
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status.error {
+      display: block;
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .setup-guide {
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .setup-guide h3 {
+      color: #1565c0;
+      margin-bottom: 12px;
+    }
+
+    .setup-guide ol {
+      margin-left: 20px;
+    }
+
+    .setup-guide li {
+      margin-bottom: 8px;
+    }
+
+    .setup-guide a {
+      color: #1565c0;
+    }
+
+    .key-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+    }
+
+    .key-status.set {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .key-status.not-set {
+      background: #fff3e0;
+      color: #e65100;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 本音レビュー 設定</h1>
+    <p class="subtitle">APIキーを設定して、本音レビュー機能を有効にしましょう</p>
+
+    <div class="setup-guide">
+      <h3>📖 セットアップガイド</h3>
+      <ol>
+        <li>
+          <strong>Google Custom Search API</strong>（必須）
+          <br>
+          <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>で「Custom Search API」を有効化し、APIキーを取得
+          <br>
+          <a href="https://programmablesearchengine.google.com/" target="_blank">Programmable Search Engine</a>で検索エンジンを作成し、IDを取得
+        </li>
+        <li>
+          <strong>AI API</strong>（要約機能に必要）
+          <br>
+          <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a> または
+          <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>でAPIキーを取得
+        </li>
+      </ol>
+    </div>
+
+    <form id="settings-form">
+      <div class="section">
+        <h2>🔎 Google Custom Search API <span class="required">必須</span></h2>
+
+        <div class="form-group">
+          <label>
+            APIキー
+            <span id="google-api-status" class="key-status not-set">未設定</span>
+          </label>
+          <input type="password" id="google-api-key" placeholder="AIza...">
+          <p class="hint">
+            <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>で取得
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>
+            検索エンジンID (cx)
+            <span id="search-engine-status" class="key-status not-set">未設定</span>
+          </label>
+          <input type="text" id="google-search-engine-id" placeholder="xxxxxxxxx:yyyyyyy">
+          <p class="hint">
+            <a href="https://programmablesearchengine.google.com/controlpanel/all" target="_blank">Programmable Search Engine</a>で作成
+            <br>
+            ※「ウェブ全体を検索」を有効にしてください
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🤖 AI分析 <span class="optional">任意</span></h2>
+
+        <div class="form-group">
+          <label>使用するAI</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="ai-provider" value="openai" checked>
+              OpenAI (GPT-4o-mini)
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="ai-provider" value="gemini">
+              Google Gemini
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            OpenAI APIキー
+            <span id="openai-status" class="key-status not-set">未設定</span>
+          </label>
+          <input type="password" id="openai-api-key" placeholder="sk-...">
+          <p class="hint">
+            <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>で取得
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>
+            Gemini APIキー
+            <span id="gemini-status" class="key-status not-set">未設定</span>
+          </label>
+          <input type="password" id="gemini-api-key" placeholder="AIza...">
+          <p class="hint">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>で取得（無料枠が大きい）
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📺 YouTube Data API <span class="optional">任意</span></h2>
+
+        <div class="form-group">
+          <label>
+            YouTube APIキー
+            <span id="youtube-status" class="key-status not-set">未設定</span>
+          </label>
+          <input type="password" id="youtube-api-key" placeholder="AIza...">
+          <p class="hint">
+            YouTubeの動画レビューを直接取得する場合に設定（未設定でもGoogle検索経由で取得可能）
+          </p>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary">💾 保存</button>
+        <button type="button" id="clear-cache-btn" class="btn btn-secondary">🗑️ キャッシュをクリア</button>
+      </div>
+
+      <!-- バックアップ/復元セクション -->
+      <div class="section" style="margin-top: 16px;">
+        <h2>💾 設定のバックアップ</h2>
+        <p class="hint" style="margin-bottom: 12px;">
+          設定をJSONファイルに保存して、後から復元できます。<br>
+          拡張機能の再インストール時などに便利です。
+        </p>
+        <div class="btn-group" style="margin-top: 12px;">
+          <button type="button" id="export-btn" class="btn btn-secondary">📤 エクスポート</button>
+          <button type="button" id="import-btn" class="btn btn-secondary">📥 インポート</button>
+          <input type="file" id="import-file" accept=".json" style="display: none;">
+        </div>
+      </div>
+
+      <div id="status" class="status"></div>
+    </form>
+  </div>
+
+  <script src="options.js" ></script>
+</body>
+</html>

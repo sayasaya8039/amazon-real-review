@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Amazon 本音レビュー",
+  "version": "1.0.0",
+  "description": "Amazonの商品ページでReddit・YouTube・価格.com・X・5ch・Zenn・Qiitaの本音レビューを表示",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://www.amazon.co.jp/*",
+    "https://www.amazon.com/*",
+    "https://www.googleapis.com/*",
+    "https://www.reddit.com/*",
+    "https://oauth.reddit.com/*",
+    "https://www.youtube.com/*",
+    "https://qiita.com/*",
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.amazon.co.jp/*",
+        "https://www.amazon.com/*"
+      ],
+      "js": ["src/lib/amazon-parser.js", "src/content/content.js"],
+      "css": ["src/content/content.css"]
+    }
+  ],
+  "side_panel": {
+    "default_path": "src/sidepanel/sidepanel.html"
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "本音レビューを表示",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  }
+}

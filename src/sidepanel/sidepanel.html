@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本音レビュー</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="container">
+    <!-- ヘッダー -->
+    <header class="header">
+      <h1>🔍 本音レビュー</h1>
+      <button id="settings-btn" class="icon-btn" title="設定">⚙️</button>
+    </header>
+
+    <!-- 商品情報 -->
+    <div id="product-info" class="product-info hidden">
+      <img id="product-image" src="" alt="商品画像">
+      <div class="product-details">
+        <h2 id="product-name"></h2>
+        <div id="amazon-rating" class="amazon-rating"></div>
+        <a id="sakura-checker-link" class="sakura-checker-link" href="" target="_blank" title="サクラチェッカーで確認">
+          🌸 サクラチェッカー
+        </a>
+      </div>
+    </div>
+
+    <!-- 読み込み中 -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>本音レビューを検索中...</p>
+    </div>
+
+    <!-- エラー表示 -->
+    <div id="error" class="error hidden">
+      <p id="error-message"></p>
+      <button id="retry-btn" class="btn">再試行</button>
+    </div>
+
+    <!-- セットアップ案内 -->
+    <div id="setup-notice" class="setup-notice hidden">
+      <h3>⚠️ 初期設定が必要です</h3>
+      <p>レビューを検索するにはAPIキーの設定が必要です。</p>
+      <button id="setup-btn" class="btn primary">設定を開く</button>
+    </div>
+
+    <!-- AI分析結果 -->
+    <div id="analysis" class="analysis hidden">
+      <div class="analysis-header">
+        <span class="analysis-icon">🤖</span>
+        <span>AI分析</span>
+        <span id="confidence-badge" class="confidence-badge"></span>
+      </div>
+      <div class="analysis-score">
+        <span>総合スコア:</span>
+        <span id="score-stars" class="stars"></span>
+        <span id="score-value" class="score-value"></span>
+      </div>
+      <p id="analysis-summary" class="analysis-summary"></p>
+
+      <div class="analysis-section">
+        <h4>📈 良い点</h4>
+        <ul id="positives-list"></ul>
+      </div>
+
+      <div class="analysis-section">
+        <h4>📉 悪い点</h4>
+        <ul id="negatives-list"></ul>
+      </div>
+
+      <div id="warnings-section" class="analysis-section warnings hidden">
+        <h4>⚠️ 注意点</h4>
+        <ul id="warnings-list"></ul>
+      </div>
+    </div>
+
+    <!-- タブ -->
+    <div id="tabs" class="tabs hidden">
+      <div class="tab-buttons" id="tab-buttons"></div>
+    </div>
+
+    <!-- 検索結果 -->
+    <div id="results" class="results hidden">
+      <div id="results-content"></div>
+    </div>
+
+    <!-- 空の状態 -->
+    <div id="empty-state" class="empty-state">
+      <p>Amazonの商品ページを開いてください</p>
+    </div>
+
+    <!-- フッター -->
+    <footer class="footer">
+      <span id="cache-indicator" class="cache-indicator hidden">📦 キャッシュから読み込み</span>
+      <span id="last-updated"></span>
+    </footer>
+  </div>
+
+  <script src="sidepanel.js" ></script>
+</body>
+</html>
