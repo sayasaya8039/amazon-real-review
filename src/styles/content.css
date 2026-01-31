@@ -1,0 +1,43 @@
+/* サクラ探知機 Content Script スタイル */
+
+#sakura-detector-badge,
+#sakura-detector-panel {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* アニメーション */
+@keyframes sakura-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#sakura-detector-badge > div,
+#sakura-detector-panel > div {
+  animation: sakura-fade-in 0.3s ease-out;
+}
+
+/* スクロールバー */
+#sakura-detector-panel > div::-webkit-scrollbar {
+  width: 6px;
+}
+
+#sakura-detector-panel > div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#sakura-detector-panel > div::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 3px;
+}
+
+#sakura-detector-panel > div::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}

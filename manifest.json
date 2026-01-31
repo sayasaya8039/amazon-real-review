@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "メルカリ/Amazon サクラ＆転売 探知機",
+  "version": "1.1.0",
+  "description": "商品ページのサクラレビューと転売品を自動検出します",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.mercari.com/*",
+    "https://jp.mercari.com/*",
+    "https://www.amazon.co.jp/*",
+    "https://www.aliexpress.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.mercari.com/jp/items/*",
+        "https://jp.mercari.com/item/*",
+        "https://www.amazon.co.jp/*/dp/*",
+        "https://www.amazon.co.jp/dp/*"
+      ],
+      "js": [
+        "src/content/index.ts"
+      ],
+      "css": [
+        "src/styles/content.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "public/icons/icon16.png",
+      "32": "public/icons/icon32.png",
+      "48": "public/icons/icon48.png",
+      "128": "public/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "32": "public/icons/icon32.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  }
+}
