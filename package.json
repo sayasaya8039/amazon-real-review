@@ -1,6 +1,6 @@
 {
   "name": "sakura-resale-detector",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "メルカリ/Amazon サクラ＆転売 探知機 - Detect fake reviews and resellers",
   "type": "module",
   "scripts": {

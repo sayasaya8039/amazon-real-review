@@ -1,6 +1,6 @@
 import type { ProductInfo, AnalysisResult, Message, MessageResponse, Settings } from '@/types';
 import { extractMercariProduct } from './mercari';
-import { extractAmazonProduct, hideMarketplaceSellers, showMarketplaceSellers } from './amazon';
+import { extractAmazonProduct, hideMarketplaceSellers, showMarketplaceSellers, hideNonPrimeInSearchResults, showNonPrimeInSearchResults, getAmazonPageType } from './amazon';
 import { injectUI } from './ui';
 
 function detectPlatform(): 'mercari' | 'amazon' | null {
@@ -26,11 +26,24 @@ async function main() {
     try {
       const settingsResponse = await sendMessage<Settings>({ type: 'GET_SETTINGS' });
       if (settingsResponse.success && settingsResponse.data?.hideMarketplaceSellers) {
-        hideMarketplaceSellers();
+        const pageType = getAmazonPageType();
+        console.log('[サクラ探知機] Amazon page type:', pageType);
+        
+        if (pageType === 'product') {
+          hideMarketplaceSellers();
+        } else if (pageType === 'search') {
+          hideNonPrimeInSearchResults();
+        }
       }
     } catch (error) {
       console.error('[サクラ探知機] Failed to get settings:', error);
     }
+  }
+
+  // 検索結果ページの場合は商品分析をスキップ
+  if (platform === 'amazon' && getAmazonPageType() === 'search') {
+    console.log('[サクラ探知機] Search page - skipping product analysis');
+    return;
   }
 
   let product: ProductInfo | null = null;
@@ -161,10 +174,20 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     const platform = detectPlatform();
     
     if (platform === 'amazon') {
+      const pageType = getAmazonPageType();
+      
       if (newSettings.hideMarketplaceSellers) {
-        hideMarketplaceSellers();
+        if (pageType === 'product') {
+          hideMarketplaceSellers();
+        } else if (pageType === 'search') {
+          hideNonPrimeInSearchResults();
+        }
       } else {
-        showMarketplaceSellers();
+        if (pageType === 'product') {
+          showMarketplaceSellers();
+        } else if (pageType === 'search') {
+          showNonPrimeInSearchResults();
+        }
       }
     }
   }

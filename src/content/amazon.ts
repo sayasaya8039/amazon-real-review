@@ -156,3 +156,104 @@ export function showMarketplaceSellers(): void {
 
   console.log('[サクラ探知機] Marketplace sellers shown');
 }
+
+
+// 検索結果ページでPrime以外の商品を非表示にする
+export function hideNonPrimeInSearchResults(): void {
+  // 検索結果の各商品アイテムを取得
+  const searchResults = document.querySelectorAll('[data-component-type="s-search-result"]');
+  
+  let hiddenCount = 0;
+  
+  searchResults.forEach((item) => {
+    const element = item as HTMLElement;
+    
+    // Prime badgeを確認（複数のセレクターで検出）
+    const hasPrimeBadge = 
+      element.querySelector('.a-icon-prime') !== null ||
+      element.querySelector('[data-component-type="s-prime-badge"]') !== null ||
+      element.querySelector('[aria-label*="Prime"]') !== null ||
+      element.querySelector('.s-prime') !== null ||
+      element.querySelector('i.a-icon.a-icon-prime') !== null;
+    
+    // Amazon.co.jpが販売・発送しているか確認
+    const shippingInfo = element.textContent || '';
+    const isAmazonFulfilled = 
+      shippingInfo.includes('Amazon.co.jpが発送') ||
+      shippingInfo.includes('Amazonが発送');
+    
+    // Prime badgeがない、かつAmazon発送でない場合は非表示
+    if (!hasPrimeBadge && !isAmazonFulfilled) {
+      element.style.display = 'none';
+      element.setAttribute('data-sakura-hidden', 'marketplace');
+      hiddenCount++;
+    }
+  });
+  
+  // 非表示件数を表示
+  showHiddenCountBanner(hiddenCount);
+  
+  console.log('[サクラ探知機] Search results: hidden ' + hiddenCount + ' non-Prime items');
+}
+
+// 検索結果ページの非表示を解除
+export function showNonPrimeInSearchResults(): void {
+  const hiddenItems = document.querySelectorAll('[data-sakura-hidden="marketplace"]');
+  
+  hiddenItems.forEach((item) => {
+    const element = item as HTMLElement;
+    element.style.display = '';
+    element.removeAttribute('data-sakura-hidden');
+  });
+  
+  // バナーを削除
+  const banner = document.getElementById('sakura-hidden-count-banner');
+  if (banner) {
+    banner.remove();
+  }
+  
+  console.log('[サクラ探知機] Search results: showing all items');
+}
+
+// 非表示件数バナーを表示
+function showHiddenCountBanner(count: number): void {
+  // 既存のバナーを削除
+  const existingBanner = document.getElementById('sakura-hidden-count-banner');
+  if (existingBanner) {
+    existingBanner.remove();
+  }
+  
+  if (count === 0) return;
+  
+  const banner = document.createElement('div');
+  banner.id = 'sakura-hidden-count-banner';
+  banner.style.cssText = 'background:#e8f5e9;border:1px solid #4caf50;padding:10px 15px;margin:10px 0;border-radius:4px;font-size:14px;display:flex;align-items:center;justify-content:space-between;';
+  banner.innerHTML = 
+    '<span>✅ <strong>' + count + '件</strong>のマーケットプレイス出品を非表示にしました（Prime対象のみ表示中）</span>' +
+    '<button id="sakura-show-all-btn" style="background:#4caf50;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;">すべて表示</button>';
+  
+  // 検索結果の上に挿入
+  const searchResultsContainer = document.querySelector('.s-main-slot') || 
+                                  document.querySelector('[data-component-type="s-search-results"]') ||
+                                  document.querySelector('#search');
+  
+  if (searchResultsContainer) {
+    searchResultsContainer.parentElement?.insertBefore(banner, searchResultsContainer);
+    
+    // 「すべて表示」ボタンのイベント
+    const showAllBtn = document.getElementById('sakura-show-all-btn');
+    if (showAllBtn) {
+      showAllBtn.addEventListener('click', () => {
+        showNonPrimeInSearchResults();
+      });
+    }
+  }
+}
+
+// ページタイプを判定
+export function getAmazonPageType(): 'product' | 'search' | 'other' {
+  const url = window.location.href;
+  if (url.includes('/dp/')) return 'product';
+  if (url.includes('/s?') || url.includes('/s/')) return 'search';
+  return 'other';
+}

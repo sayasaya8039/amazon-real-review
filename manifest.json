@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "メルカリ/Amazon サクラ＆転売 探知機",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "商品ページのサクラレビューと転売品を自動検出します",
   "permissions": [
     "storage",
@@ -25,7 +25,8 @@
         "https://www.mercari.com/jp/items/*",
         "https://jp.mercari.com/item/*",
         "https://www.amazon.co.jp/*/dp/*",
-        "https://www.amazon.co.jp/dp/*"
+        "https://www.amazon.co.jp/dp/*",
+        "https://www.amazon.co.jp/s*"
       ],
       "js": [
         "src/content/index.ts"
