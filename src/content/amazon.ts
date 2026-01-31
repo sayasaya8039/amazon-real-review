@@ -257,3 +257,174 @@ export function getAmazonPageType(): 'product' | 'search' | 'other' {
   if (url.includes('/s?') || url.includes('/s/')) return 'search';
   return 'other';
 }
+
+
+// AutoPages対応: 動的に追加される商品を監視
+let searchResultsObserver: MutationObserver | null = null;
+let totalHiddenCount = 0;
+
+// 単一の商品アイテムを処理
+function processSearchResultItem(element: HTMLElement): boolean {
+  // 既に処理済みならスキップ
+  if (element.hasAttribute('data-sakura-processed')) {
+    return false;
+  }
+  
+  // Prime badgeを確認
+  const hasPrimeBadge = 
+    element.querySelector('.a-icon-prime') !== null ||
+    element.querySelector('[data-component-type="s-prime-badge"]') !== null ||
+    element.querySelector('[aria-label*="Prime"]') !== null ||
+    element.querySelector('.s-prime') !== null ||
+    element.querySelector('i.a-icon.a-icon-prime') !== null;
+  
+  // Amazon.co.jpが販売・発送しているか確認
+  const shippingInfo = element.textContent || '';
+  const isAmazonFulfilled = 
+    shippingInfo.includes('Amazon.co.jpが発送') ||
+    shippingInfo.includes('Amazonが発送');
+  
+  // 処理済みマークを付ける
+  element.setAttribute('data-sakura-processed', 'true');
+  
+  // Prime badgeがない、かつAmazon発送でない場合は非表示
+  if (!hasPrimeBadge && !isAmazonFulfilled) {
+    element.style.display = 'none';
+    element.setAttribute('data-sakura-hidden', 'marketplace');
+    return true; // 非表示にした
+  }
+  
+  return false; // 表示のまま
+}
+
+// バナーの件数を更新
+function updateHiddenCountBanner(): void {
+  const banner = document.getElementById('sakura-hidden-count-banner');
+  if (banner) {
+    const countSpan = banner.querySelector('span');
+    if (countSpan) {
+      countSpan.innerHTML = '✅ <strong>' + totalHiddenCount + '件</strong>のマーケットプレイス出品を非表示にしました（Prime対象のみ表示中）';
+    }
+  } else if (totalHiddenCount > 0) {
+    // バナーがなければ作成
+    showHiddenCountBannerWithCount(totalHiddenCount);
+  }
+}
+
+// 件数指定でバナー表示
+function showHiddenCountBannerWithCount(count: number): void {
+  const existingBanner = document.getElementById('sakura-hidden-count-banner');
+  if (existingBanner) {
+    existingBanner.remove();
+  }
+  
+  if (count === 0) return;
+  
+  const banner = document.createElement('div');
+  banner.id = 'sakura-hidden-count-banner';
+  banner.style.cssText = 'background:#e8f5e9;border:1px solid #4caf50;padding:10px 15px;margin:10px 0;border-radius:4px;font-size:14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1000;';
+  banner.innerHTML = 
+    '<span>✅ <strong>' + count + '件</strong>のマーケットプレイス出品を非表示にしました（Prime対象のみ表示中）</span>' +
+    '<button id="sakura-show-all-btn" style="background:#4caf50;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;">すべて表示</button>';
+  
+  const searchResultsContainer = document.querySelector('.s-main-slot') || 
+                                  document.querySelector('[data-component-type="s-search-results"]') ||
+                                  document.querySelector('#search');
+  
+  if (searchResultsContainer) {
+    searchResultsContainer.parentElement?.insertBefore(banner, searchResultsContainer);
+    
+    const showAllBtn = document.getElementById('sakura-show-all-btn');
+    if (showAllBtn) {
+      showAllBtn.addEventListener('click', () => {
+        stopSearchResultsObserver();
+        showNonPrimeInSearchResults();
+      });
+    }
+  }
+}
+
+// 検索結果の監視を開始（AutoPages対応）
+export function startSearchResultsObserver(): void {
+  // 既に監視中なら何もしない
+  if (searchResultsObserver) {
+    return;
+  }
+  
+  totalHiddenCount = 0;
+  
+  // 初回処理
+  const searchResults = document.querySelectorAll('[data-component-type="s-search-result"]');
+  searchResults.forEach((item) => {
+    if (processSearchResultItem(item as HTMLElement)) {
+      totalHiddenCount++;
+    }
+  });
+  
+  updateHiddenCountBanner();
+  console.log('[サクラ探知機] Initial scan: hidden ' + totalHiddenCount + ' non-Prime items');
+  
+  // MutationObserverで新しい商品を監視
+  const targetNode = document.querySelector('.s-main-slot') || 
+                     document.querySelector('[data-component-type="s-search-results"]') ||
+                     document.querySelector('#search') ||
+                     document.body;
+  
+  searchResultsObserver = new MutationObserver((mutations) => {
+    let newHiddenCount = 0;
+    
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const element = node as HTMLElement;
+          
+          // 追加されたノードが検索結果アイテムか確認
+          if (element.matches && element.matches('[data-component-type="s-search-result"]')) {
+            if (processSearchResultItem(element)) {
+              newHiddenCount++;
+            }
+          }
+          
+          // 子要素にも検索結果アイテムがあるか確認
+          const childResults = element.querySelectorAll?.('[data-component-type="s-search-result"]');
+          childResults?.forEach((child) => {
+            if (processSearchResultItem(child as HTMLElement)) {
+              newHiddenCount++;
+            }
+          });
+        }
+      });
+    });
+    
+    if (newHiddenCount > 0) {
+      totalHiddenCount += newHiddenCount;
+      updateHiddenCountBanner();
+      console.log('[サクラ探知機] AutoPages: hidden ' + newHiddenCount + ' new non-Prime items (total: ' + totalHiddenCount + ')');
+    }
+  });
+  
+  searchResultsObserver.observe(targetNode, {
+    childList: true,
+    subtree: true,
+  });
+  
+  console.log('[サクラ探知機] Search results observer started (AutoPages ready)');
+}
+
+// 検索結果の監視を停止
+export function stopSearchResultsObserver(): void {
+  if (searchResultsObserver) {
+    searchResultsObserver.disconnect();
+    searchResultsObserver = null;
+    totalHiddenCount = 0;
+    console.log('[サクラ探知機] Search results observer stopped');
+  }
+}
+
+// 処理済みマークをリセット
+export function resetProcessedMarks(): void {
+  const processedItems = document.querySelectorAll('[data-sakura-processed]');
+  processedItems.forEach((item) => {
+    item.removeAttribute('data-sakura-processed');
+  });
+}

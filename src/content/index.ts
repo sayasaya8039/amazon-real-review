@@ -1,6 +1,6 @@
 import type { ProductInfo, AnalysisResult, Message, MessageResponse, Settings } from '@/types';
 import { extractMercariProduct } from './mercari';
-import { extractAmazonProduct, hideMarketplaceSellers, showMarketplaceSellers, hideNonPrimeInSearchResults, showNonPrimeInSearchResults, getAmazonPageType } from './amazon';
+import { extractAmazonProduct, hideMarketplaceSellers, showMarketplaceSellers, showNonPrimeInSearchResults, getAmazonPageType, startSearchResultsObserver, stopSearchResultsObserver, resetProcessedMarks } from './amazon';
 import { injectUI } from './ui';
 
 function detectPlatform(): 'mercari' | 'amazon' | null {
@@ -32,7 +32,8 @@ async function main() {
         if (pageType === 'product') {
           hideMarketplaceSellers();
         } else if (pageType === 'search') {
-          hideNonPrimeInSearchResults();
+          // AutoPages対応: MutationObserverで動的追加を監視
+          startSearchResultsObserver();
         }
       }
     } catch (error) {
@@ -180,12 +181,16 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         if (pageType === 'product') {
           hideMarketplaceSellers();
         } else if (pageType === 'search') {
-          hideNonPrimeInSearchResults();
+          // AutoPages対応: MutationObserverで動的追加を監視
+          startSearchResultsObserver();
         }
       } else {
         if (pageType === 'product') {
           showMarketplaceSellers();
         } else if (pageType === 'search') {
+          // 監視を停止して全て表示
+          stopSearchResultsObserver();
+          resetProcessedMarks();
           showNonPrimeInSearchResults();
         }
       }
